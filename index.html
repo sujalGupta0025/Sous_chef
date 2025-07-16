@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Recipe Generator</title>
     <style>
         *{
             margin: 0;
@@ -81,7 +81,7 @@
            padding: 30px;
         }
 
-        /* New search section styles */
+        /* Search section styles */
         .search-section {
             background-color: #f8f9fa;
             padding: 40px;
@@ -118,6 +118,16 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: #5a4fcf;
+        }
+
+        .search-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
 
         .filters-section {
@@ -203,7 +213,7 @@
         .recipe-image {
             width: 100%;
             height: 180px;
-            background-color: #6c5ce7;
+            background: linear-gradient(135deg, #6c5ce7, #74b9ff);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -227,24 +237,47 @@
             font-size: 0.9rem;
         }
 
-        .nutrition-info {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+        .recipe-ingredients {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
             margin-bottom: 15px;
         }
 
-        .nutrition-item {
-            background: #f8f9fa;
-            padding: 8px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 0.8rem;
-            border-left: 5px solid #6c5ce7;
+        .recipe-ingredients h4 {
+            color: #6c5ce7;
+            margin-bottom: 10px;
         }
 
-        .nutrition-item strong {
+        .recipe-ingredients ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .recipe-ingredients li {
+            padding: 3px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .recipe-instructions {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .recipe-instructions h4 {
             color: #6c5ce7;
+            margin-bottom: 10px;
+        }
+
+        .recipe-instructions ol {
+            padding-left: 20px;
+        }
+
+        .recipe-instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
         }
 
         .recipe-meta {
@@ -269,15 +302,53 @@
             font-size: 0.75rem;
         }
 
-        .loading, .no-results {
+        .dietary-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .dietary-tag {
+            background: #e8f4f8;
+            color: #6c5ce7;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .loading, .no-results, .error {
             text-align: center;
             padding: 40px;
             color: #666;
         }
-       box{
-        display: flex;
-       }
-       
+
+        .error {
+            color: #e74c3c;
+            background: #fdf2f2;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6c5ce7;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
     </style>
 </head>
@@ -296,79 +367,86 @@
             </ul>
         </div>
     </nav>
-    <box>
-    <main>
-        <div>
-            <img class="intro" src="./WhatsApp Image 2025-07-10 at 12.45.41.jpeg" alt="">
-        </div>
-    </main>
-
-    <!-- NEW SEARCH SECTION -->
-    <section class="search-section">
-        <div class="search-container">
-            <h2 style="color: rgb(5, 5, 82); margin-bottom: 20px;">Find Your Perfect Recipe</h2>
-            
-            <div class="search-box">
-                <input type="text" class="search-input" id="recipeSearch" placeholder="Search for recipes (e.g., chicken pasta, vegetarian curry)">
-                <button class="search-btn" onclick="searchRecipes()">Search Recipes</button>
+    
+    <div class="box">
+        <main>
+            <div>
+                <img class="intro" src="./WhatsApp Image 2025-07-10 at 12.45.41.jpeg" alt="">
             </div>
+        </main>
 
-            <div class="filters-section">
-                <div class="filter-group">
-                    <h3>Dietary Preferences</h3>
-                    <div class="dietary-options">
-                        <div class="dietary-option">
-                            <input type="checkbox" id="vegetarian" value="vegetarian">
-                            <label for="vegetarian">Vegetarian</label>
-                        </div>
-                        <div class="dietary-option">
-                            <input type="checkbox" id="vegan" value="vegan">
-                            <label for="vegan">Vegan</label>
-                        </div>
-                        <div class="dietary-option">
-                            <input type="checkbox" id="glutenfree" value="gluten-free">
-                            <label for="glutenfree">Gluten-Free</label>
-                        </div>
-                        <div class="dietary-option">
-                            <input type="checkbox" id="keto" value="keto">
-                            <label for="keto">Keto</label>
-                        </div>
-                        <div class="dietary-option">
-                            <input type="checkbox" id="lowcarb" value="low-carb">
-                            <label for="lowcarb">Low-Carb</label>
-                        </div>
-                        <div class="dietary-option">
-                            <input type="checkbox" id="diabetic" value="diabetic-friendly">
-                            <label for="diabetic">Diabetic-Friendly</label>
+        <!-- SEARCH SECTION -->
+        <section class="search-section">
+            <div class="search-container">
+                <h2 style="color: rgb(5, 5, 82); margin-bottom: 20px;">Find Your Perfect Recipe</h2>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" id="recipeSearch" placeholder="Search for recipes (e.g., chicken pasta, vegetarian curry)">
+                    <button class="search-btn" id="searchBtn" onclick="searchRecipes()">Generate Recipe</button>
+                </div>
+
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <h3>Dietary Preferences</h3>
+                        <div class="dietary-options">
+                            <div class="dietary-option">
+                                <input type="checkbox" id="vegetarian" value="vegetarian">
+                                <label for="vegetarian">Vegetarian</label>
+                            </div>
+                            <div class="dietary-option">
+                                <input type="checkbox" id="vegan" value="vegan">
+                                <label for="vegan">Vegan</label>
+                            </div>
+                            <div class="dietary-option">
+                                <input type="checkbox" id="glutenfree" value="gluten-free">
+                                <label for="glutenfree">Gluten-Free</label>
+                            </div>
+                            <div class="dietary-option">
+                                <input type="checkbox" id="keto" value="keto">
+                                <label for="keto">Keto</label>
+                            </div>
+                            <div class="dietary-option">
+                                <input type="checkbox" id="lowcarb" value="low-carb">
+                                <label for="lowcarb">Low-Carb</label>
+                            </div>
+                            <div class="dietary-option">
+                                <input type="checkbox" id="diabetic" value="diabetic-friendly">
+                                <label for="diabetic">Diabetic-Friendly</label>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="filter-group">
-                    <h3>Additional Requirements</h3>
-                    <textarea class="additional-input" id="additionalRequirements" placeholder="Describe any specific dietary needs, allergies, or health conditions (e.g., 'I have diabetes and need low-sugar recipes', 'Allergic to nuts', 'High protein for muscle building')"></textarea>
+                    <div class="filter-group">
+                        <h3>Additional Requirements</h3>
+                        <textarea class="additional-input" id="additionalRequirements" placeholder="Describe any specific dietary needs, allergies, or health conditions (e.g., 'I have diabetes and need low-sugar recipes', 'Allergic to nuts', 'High protein for muscle building')"></textarea>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    </box>
+        </section>
 
-    <!-- RECIPE RESULTS SECTION -->
-    <section class="recipe-results">
-        <div id="recipesContainer">
-            <div class="loading" id="loading" style="display: none;">
-                <h3>🔍 Searching for recipes...</h3>
-                <p>Finding the perfect recipes for you</p>
+        <!-- RECIPE RESULTS SECTION -->
+        <section class="recipe-results">
+            <div id="recipesContainer">
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <h3>🔍 Generating your perfect recipe...</h3>
+                    <p>AI is creating a personalized recipe based on your preferences</p>
+                </div>
+                
+                <div class="error" id="error" style="display: none;">
+                    <h3>⚠️ Something went wrong</h3>
+                    <p id="errorMessage">Please try again in a moment</p>
+                </div>
+                
+                <div class="no-results" id="noResults" style="display: none;">
+                    <h3>No recipes found</h3>
+                    <p>Try adjusting your search terms or dietary preferences</p>
+                </div>
+                
+                <div class="recipe-grid" id="recipeGrid"></div>
             </div>
-            
-            <div class="no-results" id="noResults" style="display: none;">
-                <h3>No recipes found</h3>
-                <p>Try adjusting your search terms or dietary preferences</p>
-            </div>
-            
-            <div class="recipe-grid" id="recipeGrid"></div>
-        </div>
-    </section>
+        </section>
+    </div>
 
     <div><h1 style="color: rgb(5, 5, 82);">Editor's pick</h1>
     <p style="text-align: center;">Curated Culinary Delights: Handpicked favourites by Our Expert Editors! </p></div>
@@ -467,148 +545,216 @@
     </main2>
 
     <script>
-        // Sample recipe data for demonstration
-        const sampleRecipes = [
-            {
-                id: 1,
-                title: "Diabetic-Friendly Chicken Stir-Fry",
-                description: "A healthy, low-sugar stir-fry perfect for diabetics with plenty of vegetables and lean protein.",
-                image: "🍗",
-                nutrition: {
-                    calories: 285,
-                    protein: 28,
-                    carbs: 12,
-                    fat: 15,
-                    fiber: 4,
-                    sugar: 6
-                },
-                cookingTime: "25 mins",
-                difficulty: "Easy",
-                tags: ["diabetic-friendly", "low-carb"]
-            },
-            {
-                id: 2,
-                title: "Vegan Quinoa Power Bowl",
-                description: "Nutrient-dense bowl packed with plant-based protein and healthy fats.",
-                image: "🥗",
-                nutrition: {
-                    calories: 420,
-                    protein: 16,
-                    carbs: 58,
-                    fat: 14,
-                    fiber: 8,
-                    sugar: 12
-                },
-                cookingTime: "30 mins",
-                difficulty: "Medium",
-                tags: ["vegan", "vegetarian", "gluten-free"]
-            },
-            {
-                id: 3,
-                title: "Keto Salmon with Avocado",
-                description: "High-fat, low-carb meal perfect for ketogenic diet with omega-3 rich salmon.",
-                image: "🐟",
-                nutrition: {
-                    calories: 485,
-                    protein: 32,
-                    carbs: 8,
-                    fat: 38,
-                    fiber: 6,
-                    sugar: 2
-                },
-                cookingTime: "20 mins",
-                difficulty: "Easy",
-                tags: ["keto", "low-carb", "gluten-free"]
-            }
-        ];
+        const GEMINI_API_KEY = 'AIzaSyB8nmM8gR0qJduGY_350q8Wf_Lt74Goks0';
+        const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
-        function searchRecipes() {
-            const searchTerm = document.getElementById('recipeSearch').value.toLowerCase();
-            const additionalReq = document.getElementById('additionalRequirements').value;
+        async function generateRecipeWithAI(searchTerm, dietaryPrefs, additionalRequirements) {
+            const dietaryText = dietaryPrefs.length > 0 ? `Dietary preferences: ${dietaryPrefs.join(', ')}. ` : '';
+            const additionalText = additionalRequirements ? `Additional requirements: ${additionalRequirements}. ` : '';
             
+            const prompt = `Create a detailed recipe for "${searchTerm}". ${dietaryText}${additionalText}
+            
+            Please provide the response in the following JSON format:
+            {
+                "title": "Recipe Name",
+                "description": "Brief description of the dish",
+                "ingredients": ["ingredient 1", "ingredient 2", "etc"],
+                "instructions": ["step 1", "step 2", "etc"],
+                "cookingTime": "X mins",
+                "difficulty": "Easy/Medium/Hard",
+                "servings": "X servings",
+                "dietaryTags": ["tag1", "tag2"],
+                "tips": "Optional cooking tips"
+            }
+            
+            Make sure the recipe is safe, practical, and follows the dietary requirements specified.`;
+
+            // Try multiple API endpoints
+            const endpoints = [
+                'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent',
+                'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
+                'https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent'
+            ];
+
+            for (let i = 0; i < endpoints.length; i++) {
+                try {
+                    const requestBody = {
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topP: 0.8,
+                            topK: 40,
+                            maxOutputTokens: 2048,
+                        }
+                    };
+
+                    const response = await fetch(`${endpoints[i]}?key=${GEMINI_API_KEY}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error(`API Error Response (${endpoints[i]}):`, errorText);
+                        
+                        // If this is the last endpoint, throw the error
+                        if (i === endpoints.length - 1) {
+                            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                        }
+                        continue; // Try next endpoint
+                    }
+
+                    const data = await response.json();
+                    console.log('API Response:', data);
+                    
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        const recipeText = data.candidates[0].content.parts[0].text;
+                        
+                        // Try to parse JSON from the response
+                        try {
+                            const jsonMatch = recipeText.match(/\{[\s\S]*\}/);
+                            if (jsonMatch) {
+                                const recipeData = JSON.parse(jsonMatch[0]);
+                                return recipeData;
+                            }
+                        } catch (parseError) {
+                            console.error('Error parsing JSON:', parseError);
+                        }
+                        
+                        // Fallback: create a simple recipe object from text
+                        return {
+                            title: searchTerm || 'Generated Recipe',
+                            description: 'A delicious recipe generated by AI',
+                            ingredients: ['Check the full recipe text for ingredients'],
+                            instructions: ['Check the full recipe text for instructions'],
+                            cookingTime: '30 mins',
+                            difficulty: 'Medium',
+                            servings: '2-4 servings',
+                            dietaryTags: dietaryPrefs,
+                            fullText: recipeText
+                        };
+                    } else {
+                        throw new Error('No recipe generated');
+                    }
+                } catch (error) {
+                    console.error(`Error with endpoint ${endpoints[i]}:`, error);
+                    if (i === endpoints.length - 1) {
+                        throw error;
+                    }
+                }
+            }
+        }
+
+        async function searchRecipes() {
+            const searchTerm = document.getElementById('recipeSearch').value.trim();
+            const additionalReq = document.getElementById('additionalRequirements').value.trim();
+            
+            if (!searchTerm) {
+                alert('Please enter a recipe search term');
+                return;
+            }
+
             // Get selected dietary preferences
             const dietaryPrefs = [];
             document.querySelectorAll('.dietary-option input:checked').forEach(checkbox => {
                 dietaryPrefs.push(checkbox.value);
             });
 
-            // Show loading
+            // Show loading state
             document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
             document.getElementById('noResults').style.display = 'none';
             document.getElementById('recipeGrid').innerHTML = '';
+            document.getElementById('searchBtn').disabled = true;
+            document.getElementById('searchBtn').textContent = 'Generating...';
 
-            // Simulate API call delay
-            setTimeout(() => {
+            try {
+                const recipe = await generateRecipeWithAI(searchTerm, dietaryPrefs, additionalReq);
+                
+                // Hide loading
                 document.getElementById('loading').style.display = 'none';
+                document.getElementById('searchBtn').disabled = false;
+                document.getElementById('searchBtn').textContent = 'Generate Recipe';
                 
-                // Filter recipes based on search and preferences
-                let filteredRecipes = sampleRecipes;
-                
-                if (searchTerm) {
-                    filteredRecipes = filteredRecipes.filter(recipe => 
-                        recipe.title.toLowerCase().includes(searchTerm) ||
-                        recipe.description.toLowerCase().includes(searchTerm)
-                    );
-                }
-                
-                if (dietaryPrefs.length > 0) {
-                    filteredRecipes = filteredRecipes.filter(recipe =>
-                        dietaryPrefs.some(pref => recipe.tags.includes(pref))
-                    );
-                }
-
-                if (filteredRecipes.length === 0) {
-                    document.getElementById('noResults').style.display = 'block';
+                if (recipe) {
+                    displayRecipe(recipe);
                 } else {
-                    displayRecipes(filteredRecipes);
+                    document.getElementById('noResults').style.display = 'block';
                 }
-            }, 1000);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('errorMessage').textContent = 'Failed to generate recipe. Please try again.';
+                document.getElementById('searchBtn').disabled = false;
+                document.getElementById('searchBtn').textContent = 'Generate Recipe';
+            }
         }
 
-        function displayRecipes(recipes) {
+        function displayRecipe(recipe) {
             const recipeGrid = document.getElementById('recipeGrid');
             recipeGrid.innerHTML = '';
 
-            recipes.forEach(recipe => {
-                const recipeCard = document.createElement('div');
-                recipeCard.className = 'recipe-card';
-                recipeCard.innerHTML = `
-                    <div class="recipe-image">
-                        <span>${recipe.image}</span>
+            const recipeCard = document.createElement('div');
+            recipeCard.className = 'recipe-card';
+            
+            const ingredientsList = Array.isArray(recipe.ingredients) 
+                ? recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')
+                : '<li>Check recipe details</li>';
+            
+            const instructionsList = Array.isArray(recipe.instructions)
+                ? recipe.instructions.map(inst => `<li>${inst}</li>`).join('')
+                : '<li>Check recipe details</li>';
+            
+            const dietaryTagsHtml = recipe.dietaryTags && recipe.dietaryTags.length > 0
+                ? `<div class="dietary-tags">
+                    ${recipe.dietaryTags.map(tag => `<span class="dietary-tag">${tag}</span>`).join('')}
+                   </div>`
+                : '';
+
+            recipeCard.innerHTML = `
+                <div class="recipe-image">
+                    <span>🍽️</span>
+                </div>
+                <div class="recipe-content">
+                    <h3 class="recipe-title">${recipe.title}</h3>
+                    <p class="recipe-description">${recipe.description}</p>
+                    
+                    <div class="recipe-ingredients">
+                        <h4>Ingredients:</h4>
+                        <ul>${ingredientsList}</ul>
                     </div>
-                    <div class="recipe-content">
-                        <h3 class="recipe-title">${recipe.title}</h3>
-                        <p class="recipe-description">${recipe.description}</p>
-                        
-                        <div class="nutrition-info">
-                            <div class="nutrition-item">
-                                <strong>${recipe.nutrition.calories}</strong><br>Calories
-                            </div>
-                            <div class="nutrition-item">
-                                <strong>${recipe.nutrition.protein}g</strong><br>Protein
-                            </div>
-                            <div class="nutrition-item">
-                                <strong>${recipe.nutrition.carbs}g</strong><br>Carbs
-                            </div>
-                            <div class="nutrition-item">
-                                <strong>${recipe.nutrition.fat}g</strong><br>Fat
-                            </div>
-                            <div class="nutrition-item">
-                                <strong>${recipe.nutrition.fiber}g</strong><br>Fiber
-                            </div>
-                            <div class="nutrition-item">
-                                <strong>${recipe.nutrition.sugar}g</strong><br>Sugar
-                            </div>
-                        </div>
-                        
-                        <div class="recipe-meta">
-                            <span class="cooking-time">⏱️ ${recipe.cookingTime}</span>
-                            <span class="difficulty">${recipe.difficulty}</span>
-                        </div>
+                    
+                    <div class="recipe-instructions">
+                        <h4>Instructions:</h4>
+                        <ol>${instructionsList}</ol>
                     </div>
-                `;
-                recipeGrid.appendChild(recipeCard);
-            });
+                    
+                    ${recipe.tips ? `<div style="background: #fff3cd; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                        <strong>💡 Tips:</strong> ${recipe.tips}
+                    </div>` : ''}
+                    
+                    ${dietaryTagsHtml}
+                    
+                    <div class="recipe-meta">
+                        <span class="cooking-time">⏱️ ${recipe.cookingTime}</span>
+                        <span class="difficulty">${recipe.difficulty}</span>
+                    </div>
+                    
+                    ${recipe.servings ? `<div style="text-align: center; margin-top: 10px; color: #666;">
+                        👥 ${recipe.servings}
+                    </div>` : ''}
+                </div>
+            `;
+            
+            recipeGrid.appendChild(recipeCard);
         }
 
         // Search on Enter key press
@@ -617,9 +763,6 @@
                 searchRecipes();
             }
         });
-
-        // Initialize with sample recipes
-        displayRecipes(sampleRecipes);
     </script>
 </body>
 </html>
